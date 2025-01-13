@@ -19,14 +19,13 @@ public class Filter implements jakarta.servlet.Filter {
         HttpSession session = req.getSession();
         User user = (User) session.getAttribute("user");
         
-        System.out.println(user.toString());
-        
         if (user == null) {
         	res.sendRedirect(req.getContextPath() + "/Login.jsp");
+        } else {
+        	chain.doFilter(request, response);
         }
-		else {
-            chain.doFilter(request, response);
-		}
+        
+        
 
     }
 }

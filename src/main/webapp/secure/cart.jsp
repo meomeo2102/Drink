@@ -100,32 +100,34 @@
 						<h5 class="card-title mb-4">Order Summary</h5>
 
 						<!--  SUMMARY -->
-						<div class="d-flex justify-content-between mb-3">
-							<span>Subtotal</span> <span id="subtotal" class="subtotal"><fmt:formatNumber
-									value="${subtotal}" type="currency" /></span>
-						</div>
-						<div class="d-flex justify-content-between mb-3">
-							<span>Shipping</span> <span id="shipping" class="shipping"><fmt:formatNumber
-									value="${shipping}" type="currency" /></span>
-						</div>
-						<hr>
-						<div class="d-flex justify-content-between mb-4">
-							<strong>Total</strong> <strong id="total" class="total"><fmt:formatNumber
-									value="${total}" type="currency" /></strong>
-						</div>
+						<form action="${pageContext.request.contextPath}/secure/payment"
+							method="POST">
+							<div class="d-flex justify-content-between mb-3">
+								<span>Subtotal</span> <span id="subtotal" class="subtotal" ><fmt:formatNumber
+										value="${subtotal}" type="currency" /></span>
+							</div>
+							<div class="d-flex justify-content-between mb-3">
+								<span>Shipping</span> <span id="shipping" class="shipping"><fmt:formatNumber
+										value="${shipping}" type="currency" /></span>
+							</div>
+							<hr>
+							<div class="d-flex justify-content-between mb-4">
+								<strong>Total</strong> <strong id="total" class="total"><fmt:formatNumber
+										value="${total}" type="currency" /></strong>
+							</div>
 
-						<!-- SUMMARY -->
-						<c:choose>
-							<c:when test="${subtotal <= 0}">
-								<button id="checkoutButton" class="btn btn-warning w-100"
-									disabled>Proceed to Checkout</button>
-							</c:when>
-							<c:otherwise>
-								<button id="checkoutButton" class="btn btn-primary w-100">Proceed
-									to Checkout</button>
-							</c:otherwise>
-						</c:choose>
-
+							<!-- SUMMARY -->
+							<c:choose>
+								<c:when test="${subtotal <= 0}">
+									<button id="checkoutButton" class="btn btn-warning w-100"
+										disabled>Proceed to Checkout</button>
+								</c:when>
+  								<c:otherwise>
+								<button id="checkoutButton" class="btn btn-primary w-100">
+									Proceed to Checkout</button>
+								</c:otherwise>
+							</c:choose>
+						</form>
 
 					</div>
 				</div>
@@ -147,51 +149,55 @@
 	<%@ include file="/template/includes/footer.jsp"%>
 	<script>
 		function removeItem(productId, rowElement) {
-			$.ajax({
-				url : '/zzzz/removeItem',
-				type : 'POST',
-				data : {
-					id : productId
-				},
-				success : function(response) {
-					if (response.success) {
-						alert()
-						// Xóa dòng sản phẩm khỏi giao diện
-						rowElement.remove();
-						// Cập nhật lại Summary
-						const subtotal1 = response.subtotal;
-						const shipping1 = response.shipping;
-						const total1 = response.total;
-						// Gán giá trị cho các phần tử
+			$
+					.ajax({
+						url : '/zzzz/removeItem',
+						type : 'POST',
+						data : {
+							id : productId
+						},
+						success : function(response) {
+							if (response.success) {
+								// Xóa dòng sản phẩm khỏi giao diện
+								rowElement.remove();
+								// Cập nhật lại Summary
+								const subtotal1 = response.subtotal;
+								const shipping1 = response.shipping;
+								const total1 = response.total;
+								// Gán giá trị cho các phần tử
 
-						document.getElementById('subtotal').innerHTML = "$"
-								+ subtotal1;
-						document.getElementById('shipping').innerHTML = "$"
-								+ shipping1;
-						document.getElementById('total').innerHTML = "$"
-								+ total1;
+								document.getElementById('subtotal').innerHTML = "$"
+										+ subtotal1;
+								document.getElementById('shipping').innerHTML = "$"
+										+ shipping1;
+								document.getElementById('total').innerHTML = "$"
+										+ total1;
 
-						const checkoutButton = document.getElementById('checkoutButton');
-		                if (response.subtotal <= 0) {
-		                    checkoutButton.classList.remove('btn-primary');
-		                    checkoutButton.classList.add('btn-warning');
-		                    checkoutButton.setAttribute('disabled', 'disabled');
-		                    checkoutButton.textContent = 'Proceed to Checkout';
-		                } else {
-		                    checkoutButton.classList.remove('btn-warning');
-		                    checkoutButton.classList.add('btn-primary');
-		                    checkoutButton.removeAttribute('disabled');
-		                    checkoutButton.textContent = 'Proceed to Checkout';
-		                }
-		                
-					} else {
-						alert('Có lỗi xảy ra: ' + response.message);
-					}
-				},
-				error : function() {
-					alert('Có lỗi xảy ra khi gửi yêu cầu.');
-				}
-			});
+								const checkoutButton = document
+										.getElementById('checkoutButton');
+								if (response.subtotal <= 0) {
+									checkoutButton.classList
+											.remove('btn-primary');
+									checkoutButton.classList.add('btn-warning');
+									checkoutButton.setAttribute('disabled',
+											'disabled');
+									checkoutButton.textContent = 'Proceed to Checkout';
+								} else {
+									checkoutButton.classList
+											.remove('btn-warning');
+									checkoutButton.classList.add('btn-primary');
+									checkoutButton.removeAttribute('disabled');
+									checkoutButton.textContent = 'Proceed to Checkout';
+								}
+
+							} else {
+								alert('Có lỗi xảy ra: ' + response.message);
+							}
+						},
+						error : function() {
+							alert('Có lỗi xảy ra khi gửi yêu cầu.');
+						}
+					});
 		}
 	</script>
 

@@ -23,7 +23,6 @@
 								Products</a></li>
 						<li><hr class="dropdown-divider" /></li>
 						<li><a class="dropdown-item" href="#!">Popular Items</a></li>
-						<li><a class="dropdown-item" href="#!">New Arrivals</a></li>
 					</ul></li>
 			</ul>
 
@@ -36,7 +35,7 @@
 						class="d-flex px-4" style="text-decoration: none;">
 						<button class="btn btn-outline-dark" type="button">
 							<i class="bi-cart-fill me-1"></i> Cart <span
-								class="badge bg-dark text-white ms-1 rounded-pill">${numInCart }</span>
+								class="badge bg-dark text-white ms-1 rounded-pill"></span>
 						</button>
 					</a>
 
@@ -52,7 +51,7 @@
 						<ul class="dropdown-menu">
 							<li class="text-center border-bottom"><a
 								class="dropdown-item "
-								href="${pageContext.request.contextPath}/secure/user/edit?user_id=${userId}">Edit
+								href="${pageContext.request.contextPath}/secure/edit?user_id=${userId}">Edit
 									profile</a></li>
 							<li class="text-center border-bottom"><a
 								class="dropdown-item "
@@ -65,12 +64,8 @@
 							<li class="text-center border-bottom"><a
 								class="dropdown-item "
 								href="${pageContext.request.contextPath}/logout"
-								style="text-decoration: none;">Log out</a></li>
-							<li class="text-center border-bottom"><a
-								class="dropdown-item "
-								href="${pageContext.request.contextPath}/secure/user/upload">Upload
-							</a></li>
-
+								style="text-decoration: none;">Log out</a>
+							</li>
 						</ul>
 					</div>
 				</c:when>

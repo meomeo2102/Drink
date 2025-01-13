@@ -34,8 +34,8 @@ public class Homepage extends HttpServlet {
         request.setAttribute("productList", productList);
         ServletContext context = getServletContext();
         context.setAttribute("categoryList", categoryList);
-        request.getRequestDispatcher("/Homepage.jsp").forward(request, response);
         
+        request.getRequestDispatcher("/Homepage.jsp").forward(request, response);
         	
 	}
 

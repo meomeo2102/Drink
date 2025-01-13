@@ -5,7 +5,7 @@
 <html>
 <head>
 <meta charset="UTF-8">
-<jsp:include page="template/includes/headerResource.jsp" />
+<jsp:include page="/template/includes/headerResource.jsp" />
 
 <title>${requestScope.product }</title>
 </head>

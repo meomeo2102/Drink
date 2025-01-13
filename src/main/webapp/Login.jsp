@@ -16,7 +16,7 @@
 <body>
 
 	<!-- Navbar -->
-	<%@ include file="template/includes/navbar.jsp"%>
+	<%@ include file="/template/includes/navbar.jsp"%>
 
 
 	<!-- Content -->
