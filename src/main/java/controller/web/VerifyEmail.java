@@ -31,8 +31,11 @@ public class VerifyEmail extends HttpServlet {
 		HttpSession session = req.getSession();
 		Integer authCode = (Integer) session.getAttribute("authCode");
 		String userMail = (String) session.getAttribute("userEmail");
-		System.out.println("Session email: " + session.getAttribute("userEmail"));
-		System.out.println("User email: " + userMail);
+		
+//		System.out.println("Session email: " + session.getAttribute("userEmail"));
+//		System.out.println("User email: " + userMail);
+		
+		
 		String userInputStr = req.getParameter("authCode");
 		// Check if userInputStr is not null and is a valid integer
 	    if (userInputStr != null) {
@@ -41,6 +44,7 @@ public class VerifyEmail extends HttpServlet {
 	            if (authCode != null && authCode.equals(userInput)) {
 	            	System.out.println("Session email: " + session.getAttribute("userEmail"));
 	        		System.out.println("User email: " + userMail);
+	        		
 	            	req.getRequestDispatcher("/ChangePassword.jsp").forward(req, res);
 	            } else {
 	                req.setAttribute("message", "Sai mã xác minh");

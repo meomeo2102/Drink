@@ -21,7 +21,10 @@ import dao.UserDAO;
 /**
  * Servlet implementation class UploadServlet
  */
-@MultipartConfig()
+@MultipartConfig(fileSizeThreshold = 1024 * 1024 *2,
+	maxFileSize = 1024 * 1024 * 10,
+	maxRequestSize = 1024 * 1024 *50
+)
 @WebServlet("/UploadServlet")
 public class UploadServlet extends HttpServlet {
 	private static final long serialVersionUID = 1L;
@@ -50,6 +53,7 @@ public class UploadServlet extends HttpServlet {
 			if(!Files.exists(Path.of(realPath))) {
 				Files.createDirectory(Path.of(realPath));
 			}
+			
 			String picPath = realPath + "/" + filename;
 			part.write(picPath);
 			
@@ -57,10 +61,11 @@ public class UploadServlet extends HttpServlet {
 			
 			dao.changeImg(user.getId(), "image/avatars/" + filename);
             session.setAttribute("img", "image/avatars/" + filename);
+            
 			response.sendRedirect(request.getContextPath() + "/Homepage");
 			
 		} catch (Exception e) {
-
+			e.printStackTrace();
 		
 		}
 		

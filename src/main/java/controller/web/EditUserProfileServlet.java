@@ -6,6 +6,7 @@ import java.sql.SQLException;
 
 import dao.DBConnectionPool;
 import dao.UserDAO;
+import jakarta.mail.Session;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
@@ -30,7 +31,7 @@ public class EditUserProfileServlet extends HttpServlet {
             	
                 int userId = Integer.parseInt(userIdStr);
                 UserDAO userDAO = new UserDAO(DBConnectionPool.getDataSource().getConnection());
-                
+            	
                 User user = userDAO.findById(userId);
                 if (user != null) {
                     // Đặt người dùng vào request để hiển thị trong JSP
@@ -42,7 +43,8 @@ public class EditUserProfileServlet extends HttpServlet {
                 }
                 
             } catch (NumberFormatException | SQLException e) {
-            	
+            	HttpSession session = request.getSession();
+            	session.setAttribute("errorMessage", e.getMessage());
                 response.sendRedirect(request.getContextPath() + "/error.jsp");
             }
         } else {

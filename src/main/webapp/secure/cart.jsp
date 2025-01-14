@@ -103,7 +103,7 @@
 						<form action="${pageContext.request.contextPath}/secure/payment"
 							method="POST">
 							<div class="d-flex justify-content-between mb-3">
-								<span>Subtotal</span> <span id="subtotal" class="subtotal" ><fmt:formatNumber
+								<span>Subtotal</span> <span id="subtotal" class="subtotal"><fmt:formatNumber
 										value="${subtotal}" type="currency" /></span>
 							</div>
 							<div class="d-flex justify-content-between mb-3">
@@ -122,9 +122,9 @@
 									<button id="checkoutButton" class="btn btn-warning w-100"
 										disabled>Proceed to Checkout</button>
 								</c:when>
-  								<c:otherwise>
-								<button id="checkoutButton" class="btn btn-primary w-100">
-									Proceed to Checkout</button>
+								<c:otherwise>
+									<button id="checkoutButton" class="btn btn-primary w-100">
+										Proceed to Checkout</button>
 								</c:otherwise>
 							</c:choose>
 						</form>

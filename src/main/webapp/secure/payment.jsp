@@ -54,7 +54,7 @@
 								class="d-flex justify-content-between align-items-center pb-1">
 								<a href="<%=request.getHeader("Referer")%>" class="text-muted">Go
 									back</a>
-								<form action="${pageContext.request.contextPath}/template/static/success.jsp" method="post">
+								<form action="${pageContext.request.contextPath}/template/static/Success.jsp" method="post">
 									<button type="submit" class="btn btn-primary btn-lg">Pay
 										amount</button>
 								</form>
@@ -66,8 +66,6 @@
 		</div>
 	</section>
 
-
-	<%@ include file="/template/includes/footer.jsp"%>
 
 
 </body>

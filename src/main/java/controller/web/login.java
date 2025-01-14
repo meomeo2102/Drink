@@ -48,7 +48,6 @@ public class login extends HttpServlet {
 	            String pass = req.getParameter("password");
 	            String message = "Sai thông tin tài khoản mật khẩu ";
 	            UserDAO udao = new UserDAO(connection);
-	            String role = "";
 	            
 	            HttpSession session = req.getSession();
 	            try {
@@ -56,24 +55,32 @@ public class login extends HttpServlet {
 	                if (user == null) {
 	                    req.setAttribute("message", message);
 	                    req.getRequestDispatcher("/Login.jsp").forward(req, resp);
-	                }
-	                else {
-	                	session.setAttribute("user", user);
+	                } else {
+	                    // Gán thông tin người dùng vào session
+	                    session.setAttribute("user", user);
 	                    session.setAttribute("userId", user.getId());
-	                    session.setAttribute("role", role);
+	                    session.setAttribute("isAdmin", user.isAdmin());  // Lưu thông tin admin vào session
 	                    session.setAttribute("img", user.getImg());
-	                    resp.sendRedirect("Homepage");
+	                    System.out.println(user.isAdmin(user));
+	                    // Kiểm tra xem người dùng có phải là admin không
 	                    
+	                    
+	                    if (user.isAdmin()) {
+	                        resp.sendRedirect(req.getContextPath() + "/admin/dashboard.jsp"); 
+	                        return;// Chuyển hướng đến trang dashboard nếu là admin
+	                    } else {
+	                        resp.sendRedirect("Homepage"); 
+	                        return;// Nếu không phải admin, chuyển hướng đến trang homepage
+	                    }
 	                }
 	            } catch (SQLException e) {
 	                throw new RuntimeException(e);
 	            }
+
+	        } catch (SQLException e) {
+	            throw new RuntimeException(e);
 	        } catch (Exception e) {
 	            throw new ServletException("Error connecting to the database", e);
 	        }
-
-
 	    }
-	    
-
-}
+	}

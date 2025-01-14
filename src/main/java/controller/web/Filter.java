@@ -17,8 +17,8 @@ public class Filter implements jakarta.servlet.Filter {
         HttpServletRequest req = (HttpServletRequest) request;
         HttpServletResponse res = (HttpServletResponse) response;
         HttpSession session = req.getSession();
-        User user = (User) session.getAttribute("user");
         
+        User user = (User) session.getAttribute("user");
         if (user == null) {
         	res.sendRedirect(req.getContextPath() + "/Login.jsp");
         } else {

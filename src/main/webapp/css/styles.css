@@ -128,6 +128,17 @@ h1, .h1 {
   }
 }
 
+body{
+	height: 100%;
+	display:flex;
+	flex-direction: column;
+	
+}
+
+header{
+	flex: 1;
+}
+
 h2, .h2 {
   font-size: calc(1.325rem + 0.9vw);
 }

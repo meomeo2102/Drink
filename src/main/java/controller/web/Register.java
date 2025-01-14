@@ -65,7 +65,7 @@ public class Register extends HttpServlet {
             user.setPassword(password);
             user.setEmail(email);
             user.setPhone(phoneNumber);
-            user.setIsAdmin(0);
+            user.setIsAdmin(false);
             
             
             if (userDAO.registerUser(user)) {

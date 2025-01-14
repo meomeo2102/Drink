@@ -28,9 +28,6 @@ public class Homepage extends HttpServlet {
         List<Category> categoryList = new CategoryDAO().getAllCategories();
 
         HttpSession session = request.getSession();
-        String role = (String) session.getAttribute("role");
-        if (role == null) role = "guest";
-        session.setAttribute("role", role);
         request.setAttribute("productList", productList);
         ServletContext context = getServletContext();
         context.setAttribute("categoryList", categoryList);

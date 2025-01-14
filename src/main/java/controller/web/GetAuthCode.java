@@ -60,10 +60,10 @@ public class GetAuthCode extends HttpServlet {
 				int authCode = HelperClass.generateRandom();
 				session.setAttribute("authCode", authCode);
 				session.setAttribute("userEmail", user.getEmail());
-				System.out.println("gán vào authcode");
 				req.getRequestDispatcher("/ResetPassword.jsp").forward(req, res);
 
-				// Gửi email ở nền để tăng tốc độ 
+				
+				// Gửi email bằng thread để tăng tốc độ
 				new Thread(() -> {
 					try {
 						JavaMailUtil.sendEmail(email, authCode);
@@ -74,6 +74,8 @@ public class GetAuthCode extends HttpServlet {
 					}
 				}).start();
 			}
+			
+			
 		} catch (Exception e2) {
 			 throw new ServletException("Error connecting to the database", e2);
 		}

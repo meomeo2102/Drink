@@ -10,7 +10,7 @@ public class User {
 	private String address; // Địa chỉ
 	private String phone; // Số điện thoại
 	private String Img = "image/avatars/default-avatar.png";
-	private int isAdmin;
+	private boolean isAdmin;
 	private ArrayList<Product> FavoriteProducts ;
 
 	// Constructor
@@ -26,14 +26,23 @@ public class User {
 		return this.Img;
 	}
 
-	public int getIsAdmin() {
+	public boolean getIsAdmin() {
 		return isAdmin;
 	}
 
-	public void setIsAdmin(int isAdmin) {
+	public void setIsAdmin(boolean isAdmin) {
 		this.isAdmin = isAdmin;
 	}
-
+	  public boolean isAdmin() {
+	        return this.isAdmin; // Phương thức kiểm tra quyền admin
+	  }
+	  
+	  public boolean isAdmin(User user) {
+		  if(user.getEmail()=="admin@exmaple.com")
+	        return true; // Phương thức kiểm tra quyền admin
+		  return false;
+	  }
+	  
 	public int getId() {
 		return id;
 	}
@@ -90,9 +99,10 @@ public class User {
 	@Override
 	public String toString() {
 		return "User [id=" + id + ", username=" + username + ", password=" + password + ", email=" + email
-				+ ", address=" + address + ", phone=" + phone + ", Img=" + Img + ", FavoriteProducts="
-				+ FavoriteProducts + "]";
+				+ ", address=" + address + ", phone=" + phone + ", Img=" + Img + ", isAdmin=" + isAdmin
+				+ ", FavoriteProducts=" + FavoriteProducts + "]";
 	}
+
 
 
 

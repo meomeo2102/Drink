@@ -2,6 +2,9 @@ package dao;
 
 import models.User;
 import java.sql.*;
+import java.util.ArrayList;
+import java.util.List;
+
 public class UserDAO {
 
 	private final Connection con;
@@ -10,17 +13,19 @@ public class UserDAO {
 		this.con = connection;
 	}
 
-	public User getUserRs (ResultSet rs) throws SQLException {
+	public User getUserRs(ResultSet rs) throws SQLException {
 		User user = new User();
 		user.setId(rs.getInt("id"));
 		user.setUsername(rs.getString("username"));
 		user.setPassword(rs.getString("password"));
 		user.setEmail(rs.getString("email"));
 		user.setAddress(rs.getString("address"));
+		user.setIsAdmin(rs.getBoolean("is_admin"));
 		user.setPhone(rs.getString("phone_number"));
 		user.setImg(rs.getString("images"));
 		return user;
 	}
+
 	public boolean editProfile(User user, String name, String email, int phone, String address) {
 		String sql = "UPDATE users SET username = ?, email = ?, phone_number = ?, address = ? WHERE id = ?";
 		try {
@@ -62,51 +67,50 @@ public class UserDAO {
 		return null;
 	}
 
-	public void saveImg (String path  , int id ) {
+	public void saveImg(String path, int id) {
 		String sql = "UPDATE ListUser set img = ? where user_id = ? ";
 		try {
 			PreparedStatement ps = con.prepareStatement(sql);
 			ps.setString(1, path);
-			ps.setString(2, id+"");
+			ps.setString(2, id + "");
 			ps.executeUpdate();
-		}
-		catch (SQLException e) {
+		} catch (SQLException e) {
 			e.printStackTrace();
 		}
 	}
-	public String getUserImg (int id ) throws SQLException {
+
+	public String getUserImg(int id) throws SQLException {
 		String sql = "SELECT img FROM ListUser WHERE user_id = ?";
 		try {
 			PreparedStatement ps = con.prepareStatement(sql);
-			ps.setString(1, id+"");
+			ps.setString(1, id + "");
 			ResultSet rs = ps.executeQuery();
 			while (rs.next()) {
 				return rs.getString(1);
 			}
-		}
-		catch (SQLException e) {
+		} catch (SQLException e) {
 			e.printStackTrace();
 		}
 
 		return null;
 	}
+
 	public User getUser(int id) {
 		String sql = "select * from ListUser where user_id=?";
 		try {
 			PreparedStatement ps = con.prepareStatement(sql);
-			ps.setString(1, id+"");
+			ps.setString(1, id + "");
 			ResultSet rs = ps.executeQuery();
 			while (rs.next()) {
 				return getUserRs(rs);
 			}
-		}
-		catch(Exception e) {
+		} catch (Exception e) {
 			e.printStackTrace();
 		}
 		return null;
 	}
 
-	public boolean updatePassword (String email , String password) throws SQLException {
+	public boolean updatePassword(String email, String password) throws SQLException {
 		String query = "UPDATE users SET password=? WHERE email=?";
 		PreparedStatement ps = con.prepareStatement(query);
 		ps.setString(1, password);
@@ -117,8 +121,7 @@ public class UserDAO {
 	}
 
 	public boolean registerUser(User user) throws SQLException {
-		String sql = "insert into users  (username, password, email, phone_number) " +
-				"VALUES (?,?,?,?)";
+		String sql = "insert into users  (username, password, email, phone_number) " + "VALUES (?,?,?,?)";
 
 		try {
 			PreparedStatement ps = con.prepareStatement(sql);
@@ -149,7 +152,6 @@ public class UserDAO {
 		}
 		return false;
 
-
 	}
 
 	public User getLogin(String email, String password) throws SQLException {
@@ -170,6 +172,7 @@ public class UserDAO {
 		System.out.println(s.toString());
 
 	}
+
 	public boolean checkUsername(String username) {
 		String sql = "select username from users where username=?";
 		try {
@@ -186,8 +189,8 @@ public class UserDAO {
 		}
 		return false;
 
-
 	}
+
 	public User findByEmail(String email) {
 		try {
 			PreparedStatement ps = con.prepareStatement("select * from users where email = ?");
@@ -226,6 +229,40 @@ public class UserDAO {
 		int row = ps.executeUpdate();
 		return row > 0;
 	}
-	
-	
+
+	  // Lấy tất cả người dùng
+	public List<User> getAllUsers() throws SQLException {
+	    List<User> users = new ArrayList<>();
+	    String sql = "SELECT * FROM users"; // Kiểm tra lại bảng và cột trong cơ sở dữ liệu
+
+	    try (PreparedStatement ps = con.prepareStatement(sql);
+	         ResultSet rs = ps.executeQuery()) {
+
+	        while (rs.next()) {
+	            users.add(getUserRs(rs));
+	        }
+	    } catch (SQLException e) {
+	        e.printStackTrace();
+	    }
+
+	    // Kiểm tra dữ liệu trả về
+	    System.out.println("Danh sách người dùng từ DB: " + users);
+
+	    return users;
+	}
+
+
+
+    // Xóa người dùng theo ID
+    public boolean deleteUser(int id) {
+        String sql = "DELETE FROM users WHERE id = ?";
+        try (PreparedStatement ps = con.prepareStatement(sql)) {
+            ps.setInt(1, id);
+            return ps.executeUpdate() > 0;
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return false;
+    }
+    
 }
