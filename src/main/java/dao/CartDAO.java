@@ -16,7 +16,7 @@ public class CartDAO {
     }
 
     public Cart getCartByUserId(int userId) {
-        String sql = "SELECT * FROM Cart WHERE UserId = ?";
+        String sql = "SELECT * FROM `dbo.cart` WHERE UserId = ?";
         try (PreparedStatement stmt = connection.prepareStatement(sql)) {
             stmt.setInt(1, userId);
             ResultSet rs = stmt.executeQuery();
@@ -25,7 +25,7 @@ public class CartDAO {
                 Cart cart = new Cart(cartId, userId);
 
                 // Populate cart items
-                String itemQuery = "SELECT * FROM CartItem WHERE CartId = ?";
+                String itemQuery = "SELECT * FROM `dbo.cartitem` WHERE CartId = ?";
                 try (PreparedStatement itemStmt = connection.prepareStatement(itemQuery)) {
                     itemStmt.setInt(1, cartId);
                     ResultSet itemRs = itemStmt.executeQuery();
@@ -54,7 +54,7 @@ public class CartDAO {
     }
 
     public void createCart(Cart cart) {
-        String query = "INSERT INTO Cart (UserId) VALUES (?)";
+        String query = "INSERT INTO `dbo.cart` (UserId) VALUES (?)";
         try (PreparedStatement stmt = connection.prepareStatement(query, Statement.RETURN_GENERATED_KEYS)) {
             stmt.setInt(1, cart.getUserId());
             stmt.executeUpdate();
@@ -68,8 +68,8 @@ public class CartDAO {
     }
     
     public void updateCart(Cart cart) {
-        String deleteItems = "DELETE FROM CartItem WHERE CartId = ?";
-        String insertItem = "INSERT INTO CartItem (CartId, ProductId, Quantity) VALUES (?, ?, ?)";
+        String deleteItems = "DELETE FROM `dbo.cartitem` WHERE CartId = ?";
+        String insertItem = "INSERT INTO `dbo.cartitem` (CartId, ProductId, Quantity) VALUES (?, ?, ?)";
         try (PreparedStatement deleteStmt = connection.prepareStatement(deleteItems)) {
             deleteStmt.setInt(1, cart.getCartId());
             deleteStmt.executeUpdate();
@@ -101,7 +101,7 @@ public class CartDAO {
     
     // Method to fetch all CartItems for a specific cartId
     public List<CartItem> getCartItems(int cartId) {
-        String query = "SELECT * FROM CartItem WHERE CartId = ?";
+        String query = "SELECT * FROM `dbo.cartitem` WHERE CartId = ?";
         List<CartItem> items = new ArrayList<>();
 
         try (PreparedStatement stmt = connection.prepareStatement(query)) {
@@ -130,7 +130,7 @@ public class CartDAO {
     
     // Clear all items in the cart for a given cartId
     public void clearCart(int cartId) {
-        String query = "DELETE FROM CartItem WHERE CartId = ?";
+        String query = "DELETE FROM `dbo.cartitem` WHERE CartId = ?";
         try (PreparedStatement stmt = connection.prepareStatement(query)) {
             stmt.setInt(1, cartId); // Bind the cart ID
             stmt.executeUpdate();  // Execute the DELETE query
@@ -140,7 +140,7 @@ public class CartDAO {
     }
 
 	public boolean removeCartItem(int cartId, int pId) {
-		String query = "DELETE FROM CartItem WHERE CartId = ? AND ProductId = ?";
+		String query = "DELETE FROM `dbo.cartitem` WHERE CartId = ? AND ProductId = ?";
 	    try (PreparedStatement stmt = connection.prepareStatement(query)) {
 	        // Gán giá trị cho các tham số trong câu lệnh SQL
 	        stmt.setInt(1, cartId); // Gán cartId vào tham số đầu tiên

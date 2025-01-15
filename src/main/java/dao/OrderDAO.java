@@ -15,7 +15,7 @@ public class OrderDAO {
 
     // Tạo đơn hàng mới
     public int createOrder(int userId, double totalPrice, String status) {
-        String sql = "INSERT INTO Orders (user_id, total_price, status) VALUES (?, ?, ?)";
+        String sql = "INSERT INTO `dbo.orders` (user_id, total_price, status) VALUES (?, ?, ?)";
         try ( PreparedStatement stmt = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
             stmt.setInt(1, userId);
             stmt.setDouble(2, totalPrice);
@@ -32,7 +32,7 @@ public class OrderDAO {
 
     // Thêm item vào đơn hàng
     public void addOrderItem(int orderId, int productId, int quantity, double price) {
-        String sql = "INSERT INTO Order_Items (order_id, product_id, quantity, price) VALUES (?, ?, ?, ?)";
+        String sql = "INSERT INTO `dbo.order_items` (order_id, product_id, quantity, price) VALUES (?, ?, ?, ?)";
         try ( PreparedStatement stmt = conn.prepareStatement(sql)) {
             stmt.setInt(1, orderId);
             stmt.setInt(2, productId);

@@ -17,7 +17,7 @@ public class CartItemDAO {
     }
 
     public boolean addCartItem(int cartId, int productId, int quantity) {
-        String query = "INSERT INTO CartItem (CartId, ProductId, Quantity) VALUES (?, ?, ?)";
+        String query = "INSERT INTO `dbo.cartitem` (CartId, ProductId, Quantity) VALUES (?, ?, ?)";
         try (Connection connection = DBConnectionPool.getDataSource().getConnection()) {
         	PreparedStatement stmt = connection.prepareStatement(query, Statement.RETURN_GENERATED_KEYS);
             // Kiểm tra các tham số đầu vào
@@ -48,7 +48,7 @@ public class CartItemDAO {
     
     public boolean addCartItem(Cart cart, Product product, int quantity) {
     	
-        String query = "INSERT INTO CartItem (CartId, ProductId, Quantity) VALUES (?, ?, ?)";
+        String query = "INSERT INTO `dbo.cartitem` (CartId, ProductId, Quantity) VALUES (?, ?, ?)";
         try (Connection connection = DBConnectionPool.getDataSource().getConnection()) {
         	PreparedStatement stmt = connection.prepareStatement(query, Statement.RETURN_GENERATED_KEYS);
             
@@ -74,8 +74,8 @@ public class CartItemDAO {
     }
 
 	public void setQuantity(Cart cart, Product product, int quantity) {
-		String query2 = "SELECT Quantity FROM CartItem WHERE CartId = ? AND ProductId = ?";
-		String query = "UPDATE CartItem SET Quantity = ? WHERE CartId = ? AND ProductId = ?";
+		String query2 = "SELECT Quantity FROM `dbo.cartitem` WHERE CartId = ? AND ProductId = ?";
+		String query = "UPDATE `dbo.cartitem` SET Quantity = ? WHERE CartId = ? AND ProductId = ?";
 	    try (Connection connection = DBConnectionPool.getDataSource().getConnection()) {
 	    	
 	    	// lấy quantity ban đầu 
