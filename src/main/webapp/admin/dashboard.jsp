@@ -1,221 +1,121 @@
-<%@ page language="java" contentType="text/html; charset=UTF-8"
-    pageEncoding="UTF-8"%>
+<%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
-<html>
+<!DOCTYPE html>
+<html lang="en">
 <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Admin Dashboard</title>
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            margin: 0;
-            padding: 0;
-            background-color: #f5f5f5;
-        }
-
-        header {
-            background-color: #333;
-            color: #fff;
-            padding: 15px 20px;
-            text-align: center;
-        }
-
-        nav {
-            width: 200px;
-            height: 100vh;
-            position: fixed;
-            top: 0;
-            left: 0;
-            background-color: #2c3e50;
-            color: #fff;
-            padding-top: 20px;
-        }
-
-        nav ul {
-            list-style-type: none;
-            padding: 0;
-        }
-
-        nav ul li {
-            padding: 10px 20px;
-        }
-
-        nav ul li a {
-            color: #fff;
-            text-decoration: none;
-            display: block;
-        }
-
-        nav ul li a:hover {
-            background-color: #34495e;
-        }
-
-        main {
-            margin-left: 200px;
-            padding: 20px;
-        }
-
-        .card {
-            background-color: #fff;
-            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
-            border-radius: 8px;
-            padding: 20px;
-            margin-bottom: 20px;
-            display: inline-block;
-            width: 30%;
-            text-align: center;
-        }
-
-        .card h3 {
-            margin: 10px 0;
-            color: #333;
-        }
-
-        .card p {
-            font-size: 18px;
-            color: #555;
-        }
-
-        table {
-            width: 100%;
-            border-collapse: collapse;
-            margin-top: 20px;
-        }
-
-        table, th, td {
-            border: 1px solid #ddd;
-        }
-
-        th, td {
-            padding: 8px;
-            text-align: center;
-        }
-
-        form {
-            display: inline-block;
-        }
-
-        .stat-section {
-            display: none;
-        }
-
-        .btn-show-stats {
-            background-color: #2ecc71;
-            color: white;
-            padding: 10px 20px;
-            border: none;
-            border-radius: 5px;
-            cursor: pointer;
-            margin-top: 20px;
-        }
-
-        .btn-show-stats:hover {
-            background-color: #27ae60;
-        }
-    </style>
-    <script>
-        function toggleStats() {
-            var statsSection = document.getElementById('statsSection');
-            if (statsSection.style.display === 'none' || statsSection.style.display === '') {
-                statsSection.style.display = 'block';
-            } else {
-                statsSection.style.display = 'none';
-            }
-        }
-    </script>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="${pageContext.request.contextPath}/css/admin.css">
 </head>
 <body>
-    <header>
-        <h1>Admin Dashboard</h1>
+    <header class="admin-header">
+        <div class="logo">Admin</div>
+        <div class="header-right">
+            <input type="text" class="search-bar" placeholder="Tìm kiếm...">
+            <button class="add-btn" onclick="toggleSidebar()">Menu</button>
+        </div>
     </header>
-    <nav>
+    <nav class="admin-nav">
         <ul>
-            <li><a href="admin_dashboard.jsp">Dashboard</a></li>
-            <li><a href="${pageContext.request.contextPath}/admin/product/manage">Quản lý sản phẩm</a></li>
-            <li><a href="${pageContext.request.contextPath}/manageUsers">Quản lý người dùng</a></li>
-            <li><a href="admin_categories.jsp">Quản lý danh mục</a></li>
-            <li><a href="admin_statistics.jsp">Thống kê</a></li>
-            <li><a href="logout">Đăng xuất</a></li>
+            <li><a href="${pageContext.request.contextPath}/admin/product/manage"><span class="icon">🛠️</span><span class="text">Quản lý sản phẩm</span></a></li>
+            <li><a href="${pageContext.request.contextPath}/manageUsers"><span class="icon">👥</span><span class="text">Quản lý người dùng</span></a></li>
+            <li><a href="admin_categories.jsp"><span class="icon">📋</span><span class="text">Quản lý danh mục</span></a></li>
+            <li><a href="admin_statistics.jsp"><span class="icon">📈</span><span class="text">Thống kê</span></a></li>
+            <li><a href="logout"><span class="icon">🚪</span><span class="text">Đăng xuất</span></a></li>
         </ul>
     </nav>
-    <main>
-        <h2>Chào mừng bạn đến với Admin Dashboard</h2>
-
-        <!-- Nút hiển thị thống kê -->
-        <button class="btn-show-stats" onclick="toggleStats()">Hiển thị thống kê</button>
-
-        <!-- Thống kê -->
-        <div id="statsSection" class="stat-section">
+    <main class="admin-main">
+        <h2 class="page-title">Admin Dashboard</h2>
+        <p class="subtitle">"Giữ lửa năng lượng – Đánh tan cơn khát!"</p>
+        <div class="stat-section">
             <div class="card">
                 <h3>Tổng số sản phẩm</h3>
-                <p>${totalProducts}</p>
+                <p class="value">${totalProducts}</p>
+                <p class="trend">+10% so với tháng trước</p>
             </div>
             <div class="card">
                 <h3>Tổng số người dùng</h3>
-                <p>${totalUsers}</p>
-            </div>
-            <div class="card">
-                <h3>Tổng số danh mục</h3>
-                <p>${totalCategories}</p>
+                <p class="value">${totalUsers}</p>
+                <p class="trend">+5% so với tuần trước</p>
             </div>
             <div class="card">
                 <h3>Doanh thu hôm nay</h3>
-                <p>${totalRevenue}</p>
+                <p class="value">${totalRevenue}</p>
+                <p class="trend">+7% so với hôm qua</p>
             </div>
         </div>
-
-        <h3>User List</h3>
-        <table>
-            <thead>
-                <tr>
-                    <th>ID</th>
-                    <th>Username</th>
-                    <th>Actions</th>
-                </tr>
-            </thead>
-            <tbody>
-                <c:forEach var="user" items="${userList}">
+        <button class="view-report-btn">Xem báo cáo chi tiết</button>
+        <div class="data-table">
+            <h3>Danh sách sản phẩm</h3>
+            <table>
+                <thead>
                     <tr>
-                        <td>${user.id}</td>
-                        <td>${user.username}</td>
+                        <th></th>
+                        <th>Tên</th>
+                        <th>Trạng thái</th>
+                        <th>Ngày cập nhật</th>
+                        <th>Tiến độ</th>
+                        <th>Hành động</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><img src="https://via.placeholder.com/30" alt="Avatar" class="avatar"></td>
+                        <td>Sản phẩm A</td>
+                        <td><span class="status status-red">Đang xử lý</span></td>
+                        <td>12/03/2025</td>
                         <td>
-                            <form action="/admin/dashboard" method="post">
-                                <input type="hidden" name="action" value="deleteUser">
-                                <input type="hidden" name="userId" value="${user.id}">
-                                <input type="submit" value="Delete">
-                            </form>
+                            <div class="progress-bar"><div class="progress progress-red" style="width: 70%;"></div></div> 70%
+                        </td>
+                        <td>
+                            <div class="btn-group">
+                                <button class="btn btn-sm btn-primary">Sửa</button>
+                                <button class="btn btn-sm btn-danger">Xóa</button>
+                            </div>
                         </td>
                     </tr>
-                </c:forEach>
-            </tbody>
-        </table>
-
-        <h3>Product List</h3>
-        <table>
-            <thead>
-                <tr>
-                    <th>ID</th>
-                    <th>Name</th>
-                    <th>Price</th>
-                    <th>Actions</th>
-                </tr>
-            </thead>
-            <tbody>
-                <c:forEach var="product" items="${productList}">
                     <tr>
-                        <td>${product.id}</td>
-                        <td>${product.name}</td>
-                        <td>${product.price}</td>
+                        <td><img src="https://via.placeholder.com/30" alt="Avatar" class="avatar"></td>
+                        <td>Sản phẩm B</td>
+                        <td><span class="status status-orange">Tạm hoãn</span></td>
+                        <td>12/03/2025</td>
                         <td>
-                            <form action="/admin/dashboard" method="post">
-                                <input type="hidden" name="action" value="deleteProduct">
-                                <input type="hidden" name="productId" value="${product.id}">
-                                <input type="submit" value="Delete">
-                            </form>
+                            <div class="progress-bar"><div class="progress progress-orange" style="width: 50%;"></div></div> 50%
+                        </td>
+                        <td>
+                            <div class="btn-group">
+                                <button class="btn btn-sm btn-primary">Sửa</button>
+                                <button class="btn btn-sm btn-danger">Xóa</button>
+                            </div>
                         </td>
                     </tr>
-                </c:forEach>
-            </tbody>
-        </table>
+                    <tr>
+                        <td><img src="https://via.placeholder.com/30" alt="Avatar" class="avatar"></td>
+                        <td>Sản phẩm C</td>
+                        <td><span class="status status-green">Hoàn thành</span></td>
+                        <td>12/03/2025</td>
+                        <td>
+                            <div class="progress-bar"><div class="progress progress-green" style="width: 90%;"></div></div> 90%
+                        </td>
+                        <td>
+                            <div class="btn-group">
+                                <button class="btn btn-sm btn-primary">Sửa</button>
+                                <button class="btn btn-sm btn-danger">Xóa</button>
+                            </div>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
     </main>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        function toggleSidebar() {
+            document.querySelector('.admin-nav').classList.toggle('expanded');
+            document.querySelector('.admin-main').classList.toggle('expanded');
+        }
+    </script>
 </body>
 </html>
