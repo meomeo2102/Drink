@@ -38,7 +38,6 @@ public class Payment extends HttpServlet {
             return;
         }
 
-        // Chỉ hiển thị payment.jsp, không xử lý thanh toán
         System.out.println("doGet called: Forwarding to payment.jsp");
         request.getRequestDispatcher("/secure/payment.jsp").forward(request, response);
     }
@@ -59,18 +58,14 @@ public class Payment extends HttpServlet {
             return;
         }
 
-        // Kiểm tra tham số action
         String action = request.getParameter("action");
-        System.out.println("doPost called: action = " + action); // Log để debug
+        System.out.println("doPost called: action = " + action);
 
         if ("proceedToPayment".equals(action)) {
-            // Yêu cầu từ cart.jsp: Chuyển hướng đến payment.jsp
             System.out.println("Action = proceedToPayment: Forwarding to payment.jsp");
             request.getRequestDispatcher("/secure/payment.jsp").forward(request, response);
         } else if ("pay".equals(action)) {
-            // Yêu cầu từ payment.jsp: Xử lý thanh toán
             System.out.println("Action = pay: Processing payment");
-            // Lấy dữ liệu từ form
             String[] productIds = request.getParameterValues("productIds");
             String[] quantities = request.getParameterValues("quantities");
             String[] prices = request.getParameterValues("prices");
@@ -83,8 +78,13 @@ public class Payment extends HttpServlet {
                 long orderId = paymentDAO.saveOrder(user.getId(), total, productIds, quantities, prices);
 
                 // Xóa giỏ hàng
+                System.out.println("Before clearing cart: Cart size = " + cart.getItems().size());
                 cart.clearCart();
                 session.setAttribute("cart", cart);
+                System.out.println("After clearing cart: Cart size = " + cart.getItems().size());
+                // Kiểm tra session sau khi cập nhật
+                Cart updatedCart = (Cart) session.getAttribute("cart");
+                System.out.println("Cart size in session after update: " + updatedCart.getItems().size());
 
                 // Chuyển hướng đến trang xác nhận
                 System.out.println("Payment successful: Redirecting to Success.jsp with orderId = " + orderId);
@@ -94,7 +94,6 @@ public class Payment extends HttpServlet {
                 response.sendRedirect(request.getContextPath() + "/secure/payment?error=Payment failed: " + e.getMessage());
             }
         } else {
-            // Yêu cầu không hợp lệ
             System.out.println("Invalid action: Redirecting to cart.jsp");
             response.sendRedirect(request.getContextPath() + "/secure/cart?error=Invalid request: action=" + action);
         }
