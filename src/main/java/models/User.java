@@ -1,3 +1,4 @@
+
 package models;
 
 import java.util.ArrayList;
@@ -16,6 +17,19 @@ public class User {
 	// Constructor
 	public User() {}
 
+	public void setName(String name) {
+		this.username = name; //Lưu tên người dùng vào `username`
+	}
+	private String googleId; //Lưu Google ID
+
+	public String getGoogleId() {
+		return googleId;
+	}
+
+	public void setGoogleId(String googleId) {
+		this.googleId = googleId;
+	}
+
 	// Getter và Setter
 
 	public void setImg (String path) {
@@ -33,16 +47,14 @@ public class User {
 	public void setIsAdmin(boolean isAdmin) {
 		this.isAdmin = isAdmin;
 	}
-	  public boolean isAdmin() {
-	        return this.isAdmin; // Phương thức kiểm tra quyền admin
-	  }
-	  
-	  public boolean isAdmin(User user) {
-		  if(user.getEmail()=="admin@exmaple.com")
-	        return true; // Phương thức kiểm tra quyền admin
-		  return false;
-	  }
-	  
+	public boolean isAdmin() {
+		return this.isAdmin; // Phương thức kiểm tra quyền admin
+	}
+
+	public boolean isAdmin(User user) {
+		return user.getEmail().equals("admin@example.com");
+	}
+
 	public int getId() {
 		return id;
 	}

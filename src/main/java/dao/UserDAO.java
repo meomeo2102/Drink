@@ -68,11 +68,10 @@ public class UserDAO {
 	}
 
 	public void saveImg(String path, int id) {
-		String sql = "UPDATE ListUser set img = ? where user_id = ? ";
-		try {
-			PreparedStatement ps = con.prepareStatement(sql);
+		String sql = "UPDATE `dbo.users` SET images = ? WHERE id = ?";
+		try (PreparedStatement ps = con.prepareStatement(sql)) {
 			ps.setString(1, path);
-			ps.setString(2, id + "");
+			ps.setInt(2, id);
 			ps.executeUpdate();
 		} catch (SQLException e) {
 			e.printStackTrace();
@@ -80,7 +79,7 @@ public class UserDAO {
 	}
 
 	public String getUserImg(int id) throws SQLException {
-		String sql = "SELECT img FROM ListUser WHERE user_id = ?";
+		String sql = "SELECT images FROM `dbo.users` WHERE id = ?";
 		try {
 			PreparedStatement ps = con.prepareStatement(sql);
 			ps.setString(1, id + "");
@@ -96,19 +95,19 @@ public class UserDAO {
 	}
 
 	public User getUser(int id) {
-		String sql = "select * from ListUser where user_id=?";
-		try {
-			PreparedStatement ps = con.prepareStatement(sql);
-			ps.setString(1, id + "");
+		String sql = "SELECT * FROM `dbo.users` WHERE id=?";
+		try (PreparedStatement ps = con.prepareStatement(sql)) {
+			ps.setInt(1, id);
 			ResultSet rs = ps.executeQuery();
-			while (rs.next()) {
+			if (rs.next()) { // Kiểm tra chỉ một kết quả
 				return getUserRs(rs);
 			}
-		} catch (Exception e) {
+		} catch (SQLException e) {
 			e.printStackTrace();
 		}
-		return null;
+		return null; // Trả về null nếu không tìm thấy user
 	}
+
 
 	public boolean updatePassword(String email, String password) throws SQLException {
 		String query = "UPDATE `dbo.users` SET password=? WHERE email=?";
@@ -137,21 +136,14 @@ public class UserDAO {
 	}
 
 	public boolean checkEmailExist(String email) {
-		String sql = "select email from `dbo.users` where email=?";
-		try {
-			PreparedStatement ps = con.prepareStatement(sql);
+		String sql = "SELECT email FROM `dbo.users` WHERE email=?";
+		try (PreparedStatement ps = con.prepareStatement(sql)) {
 			ps.setString(1, email);
 			ResultSet rs = ps.executeQuery();
-			while (rs.next()) {
-				if (rs.getString("email").equals(email)) {
-					return true;
-				}
-			}
-		} catch (Exception e) {
+			return rs.next(); // Trả về true nếu có kết quả, false nếu không
+		} catch (SQLException e) {
 			throw new RuntimeException(e);
 		}
-		return false;
-
 	}
 
 	public User getLogin(String email, String password) throws SQLException {
@@ -255,7 +247,7 @@ public class UserDAO {
 		String sql = "DELETE FROM `dbo.users` WHERE id = ?"; // Câu lệnh xóa người dùng theo id
 
 		try (Connection connection = DBConnectionPool.getConnection();
-				PreparedStatement stmt = connection.prepareStatement(sql)) {
+			 PreparedStatement stmt = connection.prepareStatement(sql)) {
 
 			// Thiết lập tham số ID cho câu lệnh DELETE
 			stmt.setInt(1, userId);
@@ -271,7 +263,7 @@ public class UserDAO {
 	public boolean insertUser(User user) {
 		String sql = "INSERT INTO `dbo.users` (username, email, phone, address) VALUES (?, ?, ?, ?)";
 		try (Connection connection = DBConnectionPool.getConnection();
-				PreparedStatement stmt = connection.prepareStatement(sql)) {
+			 PreparedStatement stmt = connection.prepareStatement(sql)) {
 
 			// Thiết lập tham số cho PreparedStatement
 			stmt.setString(1, user.getUsername());
@@ -295,8 +287,8 @@ public class UserDAO {
 	public int getTotalUsers() {
 		String query = "SELECT COUNT(*) FROM `dbo.users`";
 		try (Connection connection = DBConnectionPool.getConnection();
-				Statement stmt = connection.createStatement();
-				ResultSet rs = stmt.executeQuery(query)) {
+			 Statement stmt = connection.createStatement();
+			 ResultSet rs = stmt.executeQuery(query)) {
 
 			// Kiểm tra nếu có dữ liệu trả về từ câu truy vấn
 			if (rs.next()) {
@@ -308,4 +300,31 @@ public class UserDAO {
 		return 0; // Trả về 0 nếu có lỗi hoặc không tìm thấy dữ liệu
 	}
 
-}
+	public boolean updateUserGoogleId(User user) {
+		String sqlCheck = "SELECT google_id FROM `dbo.users` WHERE email = ?";
+		try (PreparedStatement checkStmt = con.prepareStatement(sqlCheck)) {
+			checkStmt.setString(1, user.getEmail());
+			ResultSet rs = checkStmt.executeQuery();
+
+			if (rs.next() && rs.getString("google_id") != null) {
+				System.out.println("Google ID đã tồn tại, không cần cập nhật!");
+				return false; // Không cập nhật nếu đã có
+			}
+		} catch (SQLException e) {
+			e.printStackTrace();
+			return false;
+		}
+
+		String sqlUpdate = "UPDATE `dbo.users` SET google_id = ? WHERE email = ?";
+		try (PreparedStatement stmt = con.prepareStatement(sqlUpdate)) {
+			stmt.setString(1, user.getGoogleId());
+			stmt.setString(2, user.getEmail());
+
+			int rowsAffected = stmt.executeUpdate();
+			return rowsAffected > 0;
+		} catch (SQLException e) {
+			e.printStackTrace();
+			return false;
+		}
+	}
+		}

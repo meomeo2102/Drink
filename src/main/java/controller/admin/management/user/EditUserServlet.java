@@ -17,87 +17,83 @@ import models.User;
 @WebServlet("/admin/EditUserServlet")
 public class EditUserServlet extends HttpServlet {
 
-    // GET method: Lấy thông tin người dùng để hiển thị trên form chỉnh sửa
+    // GET: Lấy thông tin user theo ID để hiển thị form chỉnh sửa
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         int id = -1;
-
-        // Lấy tham số ID từ request
         try {
             id = Integer.parseInt(request.getParameter("id"));
         } catch (NumberFormatException e) {
-            // Nếu id không hợp lệ, trả về lỗi
             response.sendError(HttpServletResponse.SC_BAD_REQUEST, "ID không hợp lệ.");
             return;
         }
 
-        // Sử dụng try-with-resources để quản lý kết nối cơ sở dữ liệu
         try (Connection connection = DBConnectionPool.getConnection()) {
             UserDAO userDAO = new UserDAO(connection);
-
-            // Lấy thông tin người dùng từ cơ sở dữ liệu
             User user = userDAO.getUser(id);
             if (user != null) {
-                // Truyền đối tượng user vào request và forward đến trang editUser.jsp
                 request.setAttribute("user", user);
                 RequestDispatcher dispatcher = request.getRequestDispatcher("/admin/edit_user.jsp");
                 dispatcher.forward(request, response);
             } else {
-                // Nếu không tìm thấy người dùng, trả về lỗi 404
                 response.sendError(HttpServletResponse.SC_NOT_FOUND, "Người dùng không tìm thấy.");
             }
         } catch (SQLException e) {
-            // Xử lý lỗi khi không thể kết nối cơ sở dữ liệu
-            response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Lỗi kết nối cơ sở dữ liệu.");
             e.printStackTrace();
+            response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Lỗi kết nối cơ sở dữ liệu.");
         }
     }
 
-    // POST method: Cập nhật thông tin người dùng
+    // POST: Cập nhật thông tin user
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-        int id = -1;
-
-        // Lấy tham số ID từ request
+        int id = -1; // Khởi tạo giá trị mặc định
         try {
-            id = Integer.parseInt(request.getParameter("id"));
+            id = Integer.parseInt(request.getParameter("user_id")); // Đọc ID từ form
         } catch (NumberFormatException e) {
             response.sendError(HttpServletResponse.SC_BAD_REQUEST, "ID không hợp lệ.");
             return;
         }
 
-        // Lấy các tham số chỉnh sửa từ form
+        // Lấy dữ liệu từ form
         String username = request.getParameter("username");
         String email = request.getParameter("email");
-        String phone = request.getParameter("phone");
+        String phoneStr = request.getParameter("phone");
         String address = request.getParameter("address");
 
-        // Kiểm tra tính hợp lệ của các tham số
-        if (username == null || email == null || phone == null || address == null) {
-            response.sendError(HttpServletResponse.SC_BAD_REQUEST, "Dữ liệu không hợp lệ.");
+        // Kiểm tra dữ liệu không được null hoặc rỗng
+        if (username == null || username.trim().isEmpty() ||
+                email == null || email.trim().isEmpty() ||
+                phoneStr == null || phoneStr.trim().isEmpty() ||
+                address == null || address.trim().isEmpty()) {
+            response.sendError(HttpServletResponse.SC_BAD_REQUEST, "Dữ liệu không hợp lệ hoặc thiếu.");
             return;
         }
 
-        // Sử dụng try-with-resources để quản lý kết nối cơ sở dữ liệu
+        int phone = 0;
+        try {
+            phone = Integer.parseInt(phoneStr);
+        } catch (NumberFormatException e) {
+            response.sendError(HttpServletResponse.SC_BAD_REQUEST, "Số điện thoại không hợp lệ.");
+            return;
+        }
+
         try (Connection connection = DBConnectionPool.getConnection()) {
             UserDAO userDAO = new UserDAO(connection);
-
-            // Lấy thông tin người dùng
             User user = userDAO.getUser(id);
             if (user != null) {
-                // Cập nhật thông tin người dùng
-                boolean isUpdated = userDAO.editProfile(user, username, email, Integer.parseInt(phone), address);
+                // Cập nhật thông tin user, giả sử editProfile có cú pháp như vậy
+                boolean isUpdated = userDAO.editProfile(user, username, email, phone, address);
                 if (isUpdated) {
-                    // Nếu cập nhật thành công, chuyển hướng đến trang quản lý người dùng
-                    response.sendRedirect("ManageUserServlet");
+                    // Chuyển hướng về trang quản lý người dùng (đường dẫn chính xác tuỳ dự án)
+                    response.sendRedirect(request.getContextPath() + "/admin/ManageUserServlet");
                 } else {
-                    response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Cập nhật thông tin người dùng thất bại.");
+                    response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Cập nhật thất bại.");
                 }
             } else {
                 response.sendError(HttpServletResponse.SC_NOT_FOUND, "Người dùng không tìm thấy.");
             }
         } catch (SQLException e) {
-            // Xử lý lỗi khi thực hiện thao tác với cơ sở dữ liệu
-            response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Lỗi truy vấn dữ liệu.");
             e.printStackTrace();
+            response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Lỗi truy vấn dữ liệu.");
         }
     }
 }

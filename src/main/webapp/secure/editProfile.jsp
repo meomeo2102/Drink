@@ -122,6 +122,6 @@
 
 	<!-- FOOTER -->
 	<%@ include file="/template/includes/footer.jsp"%>
-	
+
 </body>
 </html>

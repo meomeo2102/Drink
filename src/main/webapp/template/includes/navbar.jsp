@@ -29,7 +29,7 @@
 			<c:set var="userId" value="${sessionScope.userId}" />
 			<c:set var="userImg" value="${sessionScope.img}" />
 			<c:choose>
-				<c:when test="${userId != null}">
+				<c:when test="${sessionScope.user != null}">
 					<a
 						href="${pageContext.request.contextPath}/secure/cart?userId=${sessionScope.user.getId()}"
 						class="d-flex px-4" style="text-decoration: none;">
@@ -38,7 +38,6 @@
 								class="badge bg-dark text-white ms-1 rounded-pill"></span>
 						</button>
 					</a>
-
 					<div class="dropdown">
 						<button class="btn dropdown-toggle d-flex align-items-center"
 							type="button" id="userDropdown" data-bs-toggle="dropdown"
