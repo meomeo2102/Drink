@@ -1,6 +1,6 @@
 package controller.web;
 
-import dao.PaymentDAO;
+import dao.OrderDAO;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
@@ -8,18 +8,21 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
 import models.Cart;
+import models.Order;
 import models.User;
 
 import java.io.IOException;
+import java.util.logging.Logger;
 
 @WebServlet("/secure/payment")
 public class Payment extends HttpServlet {
     private static final long serialVersionUID = 1L;
-    private PaymentDAO paymentDAO;
+    private OrderDAO orderDAO;
+    private static final Logger LOGGER = Logger.getLogger(Payment.class.getName());
 
     @Override
     public void init() throws ServletException {
-        paymentDAO = new PaymentDAO();
+        orderDAO = new OrderDAO();
     }
 
     @Override
@@ -29,17 +32,24 @@ public class Payment extends HttpServlet {
         Cart cart = (Cart) session.getAttribute("cart");
 
         if (user == null) {
-            response.sendRedirect(request.getContextPath() + "/login?error=Please login to proceed with payment");
+            LOGGER.warning("User not logged in, redirecting to login");
+            response.sendRedirect(request.getContextPath() + "/login?error=Vui lòng đăng nhập để thanh toán");
             return;
         }
 
         if (cart == null || cart.getItems().isEmpty()) {
-            response.sendRedirect(request.getContextPath() + "/secure/cart?error=Your cart is empty");
+            LOGGER.warning("Cart is empty, redirecting to cart");
+            response.sendRedirect(request.getContextPath() + "/secure/cart?error=Giỏ hàng trống");
             return;
         }
 
-        System.out.println("doGet called: Forwarding to payment.jsp");
-        request.getRequestDispatcher("/secure/payment.jsp").forward(request, response);
+        LOGGER.info("doGet called: Forwarding to payment.jsp");
+        try {
+            request.getRequestDispatcher("/secure/payment.jsp").forward(request, response);
+        } catch (Exception e) {
+            LOGGER.severe("Error forwarding to payment.jsp: " + e.getMessage());
+            throw new ServletException("Lỗi khi chuyển tiếp đến trang thanh toán", e);
+        }
     }
 
     @Override
@@ -49,53 +59,62 @@ public class Payment extends HttpServlet {
         Cart cart = (Cart) session.getAttribute("cart");
 
         if (user == null) {
-            response.sendRedirect(request.getContextPath() + "/login?error=Please login to proceed with payment");
+            LOGGER.warning("User not logged in, redirecting to login");
+            response.sendRedirect(request.getContextPath() + "/login?error=Vui lòng đăng nhập để thanh toán");
             return;
         }
 
         if (cart == null || cart.getItems().isEmpty()) {
-            response.sendRedirect(request.getContextPath() + "/secure/cart?error=Your cart is empty");
+            LOGGER.warning("Cart is empty, redirecting to cart");
+            response.sendRedirect(request.getContextPath() + "/secure/cart?error=Giỏ hàng trống");
             return;
         }
 
         String action = request.getParameter("action");
-        System.out.println("doPost called: action = " + action);
+        LOGGER.info("doPost called: action = " + action);
 
         if ("proceedToPayment".equals(action)) {
-            System.out.println("Action = proceedToPayment: Forwarding to payment.jsp");
-            request.getRequestDispatcher("/secure/payment.jsp").forward(request, response);
-        } else if ("pay".equals(action)) {
-            System.out.println("Action = pay: Processing payment");
-            String[] productIds = request.getParameterValues("productIds");
-            String[] quantities = request.getParameterValues("quantities");
-            String[] prices = request.getParameterValues("prices");
-            double subtotal = Double.parseDouble(request.getParameter("subtotal"));
-            double shipping = Double.parseDouble(request.getParameter("shipping"));
-            double total = Double.parseDouble(request.getParameter("total"));
-
+            LOGGER.info("Action = proceedToPayment: Forwarding to payment.jsp");
             try {
-                // Lưu đơn hàng vào cơ sở dữ liệu
-                long orderId = paymentDAO.saveOrder(user.getId(), total, productIds, quantities, prices);
-
-                // Xóa giỏ hàng
-                System.out.println("Before clearing cart: Cart size = " + cart.getItems().size());
-                cart.clearCart();
-                session.setAttribute("cart", cart);
-                System.out.println("After clearing cart: Cart size = " + cart.getItems().size());
-                // Kiểm tra session sau khi cập nhật
-                Cart updatedCart = (Cart) session.getAttribute("cart");
-                System.out.println("Cart size in session after update: " + updatedCart.getItems().size());
-
-                // Chuyển hướng đến trang xác nhận
-                System.out.println("Payment successful: Redirecting to Success.jsp with orderId = " + orderId);
-                response.sendRedirect(request.getContextPath() + "/template/static/Success.jsp?orderId=" + orderId);
+                request.getRequestDispatcher("/secure/payment.jsp").forward(request, response);
             } catch (Exception e) {
+                LOGGER.severe("Error forwarding to payment.jsp: " + e.getMessage());
+                throw new ServletException("Lỗi khi chuyển tiếp đến trang thanh toán", e);
+            }
+        } else if ("pay".equals(action)) {
+            LOGGER.info("Action = pay: Processing payment");
+            try {
+                String paymentMethod = request.getParameter("paymentMethod");
+                LOGGER.info("Payment method: " + paymentMethod);
+                if (paymentMethod == null || paymentMethod.isEmpty()) {
+                    LOGGER.warning("Payment method is empty");
+                    response.sendRedirect(request.getContextPath() + "/secure/payment?error=Phương thức thanh toán không được để trống");
+                    return;
+                }
+
+                double totalPrice = cart.getTotalPrice() + (cart.getTotalPrice() > 0 ? 10.00 : 0.00); // Thêm phí vận chuyển
+                int orderId = orderDAO.createOrder(user.getId(), totalPrice, paymentMethod);
+                if (orderId > 0) {
+                    orderDAO.saveOrderDetails(orderId, cart.getItems());
+                    cart.clearCart();
+                    session.setAttribute("cart", cart);
+                    LOGGER.info("Payment successful: Forwarding to invoice.jsp with orderId = " + orderId);
+
+                    Order order = orderDAO.getOrderById(orderId);
+                    request.setAttribute("order", order);
+                    request.getRequestDispatcher("/secure/invoice.jsp").forward(request, response);
+                } else {
+                    LOGGER.warning("Payment failed: Redirecting to payment.jsp with error");
+                    response.sendRedirect(request.getContextPath() + "/secure/payment?error=Thanh toán thất bại");
+                }
+            } catch (Exception e) {
+                LOGGER.severe("Payment processing error: " + e.getMessage());
                 e.printStackTrace();
-                response.sendRedirect(request.getContextPath() + "/secure/payment?error=Payment failed: " + e.getMessage());
+                response.sendRedirect(request.getContextPath() + "/secure/payment?error=Thanh toán thất bại: " + e.getMessage());
             }
         } else {
-            System.out.println("Invalid action: Redirecting to cart.jsp");
-            response.sendRedirect(request.getContextPath() + "/secure/cart?error=Invalid request: action=" + action);
+            LOGGER.warning("Invalid action: Redirecting to cart.jsp");
+            response.sendRedirect(request.getContextPath() + "/secure/cart?error=Yêu cầu không hợp lệ: action=" + action);
         }
     }
 }
